@@ -50,6 +50,6 @@ Another endpoint `/birds` - The second requirement for this project involves con
 
 ## Additional Notes
 
-The most efficient way to solve this problem probably involves pre-processing the data and then serving that pre-processed data, but I would like you to assume that a different process will add to the data (with no assumption as to the magnitude of the additions). Your solution should be optimized for a system that could expand to billions of nodes. 
+The most efficient way to narrowly solve this problem probably involves pre-processing the data and then serving that pre-processed data, but we are not interested in a narrow solution. So I would like you to assume that a different process will add to the data (with no assumption as to the magnitude of the additions). Your solution should be optimized for a system that could expand to billions of nodes. 
 
 
