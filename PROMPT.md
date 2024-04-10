@@ -1,10 +1,10 @@
-At dataPlor we write software that deals with exponentially expanding data. We are looking for people who can take novel problems, demonstrate first principles design and performance that flows from deep understanding, and integrate that into best practices code quality and organization.
+At dataPlor we write software that deals with exponentially expanding data. We are looking for people who can solve novel problems by demonstrating first principles of design and performance that flow from deep understanding and integrating them into best practices of code quality and organization.
 
-This code challenge is designed to test your decision making while trying to not write a lot of code or take a ton of time. That said, we do value clean, well organized code.
+This code challenge is designed to test your decision making without writing a lot of code or taking a ton of time. That said, we do value clean, well-organized code.
 
-There's no set deadline, take as much time as you think you need and let us know when to expect it. 
+There's no set deadline. Take as much time as you need and let us know when to expect it. 
 
-Our objective is to assess how you think about, approach, and solve novel problems, so to the extent that you want to include a README about your thinking that you feel might not come through in the code about directions you considered but didn't implement, that helps us as well.
+Our objective is to assess how you think about, approach, and solve novel problems. Feel free to include a README that explains your thinking, solutions you considered but didn't implement, or anything else you feel might not come through in the code.
 
 ## The ask
 We have an adjacency list that creates a tree of nodes where a child's `parent_id` = a parent's `id`. We have provided some sample data in the attached csv.
@@ -50,6 +50,6 @@ Another endpoint `/birds` - The second requirement for this project involves con
 
 ## Additional Notes
 
-The most efficient way to narrowly solve this problem probably involves pre-processing the data and then serving that pre-processed data, but we are not interested in a narrow solution. So I would like you to assume that a different process will add to the data (with no assumption as to the magnitude of the additions). Your solution should be optimized for a system that could expand to billions of nodes. 
+The most efficient way to narrowly solve this problem probably involves pre-processing the data and then serving that pre-processed data, but we are not interested in a narrow solution. So, we would like you to assume that a different process will add to the data (with no assumption as to the magnitude of the additions). Your solution should be optimized for a system that could expand to billions of nodes. 
 
 
