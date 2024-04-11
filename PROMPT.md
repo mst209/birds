@@ -9,7 +9,7 @@ Our objective is to assess how you think about, approach, and solve novel proble
 ## The ask
 We have an adjacency list that creates a tree of nodes where a child's `parent_id` = a parent's `id`. We have provided some sample data in the attached csv.
 
-Please make an api (rails, sinatra, cuba--your choice) that has two endpoints: 
+Please make an API using PostgreSQL and Ruby (rails, sinatra, cuba - your choice) that has two endpoints:
 
 ### 1. Common Ancestor 
 `/nodes/:node_a_id/common_ancestors/:node_b_id` - It should return the `root_id`, `lowest_common_ancestor_id`, and `depth` of tree of the lowest common ancestor that those two node ids share.
