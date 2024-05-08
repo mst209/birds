@@ -48,6 +48,10 @@ if a==b, it should return itself
 
 Another endpoint `/birds` - The second requirement for this project involves considering a second model, birds. Nodes have_many birds and birds belong_to nodes. Our second endpoint should take a list of `node_ids` and return the ids of the birds that belong to any of those nodes or any descendant nodes.
 
+## Submission
+
+Please fork this repository and provide a link to your fork. Do not submit a pull request.
+
 ## Additional Notes
 
 The most efficient way to narrowly solve this problem probably involves pre-processing the data and then serving that pre-processed data, but we are not interested in a narrow solution. So, we would like you to assume that a different process will add to the data (with no assumption as to the magnitude of the additions). Your solution should be optimized for a system that could expand to billions of nodes. 
