@@ -14,7 +14,7 @@ RSpec.describe Node do
 
     it 'handles cyclical reference of 10, and should return 9,10,11,12' do
       a = described_class.find(10)
-      expect(a.self_and_parents.map(&:id)).to contain_exactly(9, 10)
+      expect(a.self_and_parents.map(&:id)).to contain_exactly(9,10,11,12)
     end
   end
 
@@ -86,7 +86,7 @@ RSpec.describe Node do
 
     it 'handles cyclical reference and returns a root of 9' do
       a = described_class.find(10)
-      expect(a.root.id).to eq(9)
+      expect(a.root.id).to eq(11)
     end
 
     it 'handles cyclical reference and returns a root of 10' do
@@ -116,11 +116,11 @@ RSpec.describe Node do
       expect(a.depth).to eq(1)
     end
 
-    it 'handles cyclical reference and returns 2' do
+    it 'handles cyclical reference and returns 4' do
       a = described_class.find(9)
       b = described_class.find(10)
-      expect(a.depth).to eq(2)
-      expect(b.depth).to eq(2)
+      expect(a.depth).to eq(4)
+      expect(b.depth).to eq(4)
     end
   end
 
@@ -141,7 +141,7 @@ RSpec.describe Node do
     end
 
     it 'cyclical / child' do
-      expect(described_class.compare(9, 11)).to eq({ root_id: 10, lowest_common_ancestor: 9, depth: 2 })
+      expect(described_class.compare(9, 11)).to eq({ root_id: 10, lowest_common_ancestor: 9, depth: 4 })
     end
   end
 

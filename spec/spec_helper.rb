@@ -102,7 +102,8 @@ def setup_data
   Node.create!(id: 4, parent_id: 7)
   Node.create!(id: 8, parent_id: 7)
   Node.create!(id: 5, parent_id: 4)
-  Node.create!(id: 9, parent_id: 10)
+
+  Node.create!(id: 9, parent_id: 12)
   Node.create!(id: 10, parent_id: 9)
   Node.create!(id: 11, parent_id: 10)
   Node.create!(id: 12, parent_id: 11)

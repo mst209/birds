@@ -50,7 +50,8 @@ def setup_data
   Node.create!(id: 4, parent_id: 7)
   Node.create!(id: 8, parent_id: 7)
   Node.create!(id: 5, parent_id: 4)
-  Node.create!(id: 9, parent_id: 10)
+
+  Node.create!(id: 9, parent_id: 12)
   Node.create!(id: 10, parent_id: 9)
   Node.create!(id: 11, parent_id: 10)
   Node.create!(id: 12, parent_id: 11)
@@ -76,9 +77,10 @@ flowchart TD
     D((Node 4)) --> F((Node 5))
 
     G((Node 9)) --> H((Node 10))
-    H((Node 10)) == Cyclical ==> G((Node 9))
     H((Node 10)) --> I((Node 11))
     I((Node 11)) --> J((Node 12))
+    J((Node 12)) == Cyclical ==> G((Node 9))
+
     
     C((Node 2)) --> Z{{Bird 101}}:::err
     D((Node 4)) --> Y{{Bird 102}}:::err
