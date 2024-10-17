@@ -1,6 +1,6 @@
 class BirdsController < ApplicationController
   def index
-    render json: Node.search(node_ids)
+    render json: Node.search_birds(node_ids)
   end
 
   private

@@ -14,6 +14,12 @@ RSpec.describe Node do
     described_class.create!(id: 10, parent_id: 9)
     described_class.create!(id: 11, parent_id: 10)
     described_class.create!(id: 12, parent_id: 11)
+
+    Bird.create!(id: 101, node_id: 2)
+    Bird.create!(id: 102, node_id: 4)
+    Bird.create!(id: 103, node_id: 5)
+    Bird.create!(id: 104, node_id: 6)
+    Bird.create!(id: 105, node_id: 5)
   end
 
   describe 'self_and_parents' do
@@ -152,6 +158,18 @@ RSpec.describe Node do
 
     it 'cyclical / child' do
       expect(described_class.compare(9, 11)).to eq({ root_id: 10, lowest_common_ancestor: 9, depth: 2 })
+    end
+  end
+
+  describe 'descendant_ids' do
+    it 'returns the node ids given and their decendents' do
+      expect(described_class.descendant_ids([2, 4])).to eq([2, 4, 5])
+    end
+  end
+
+  describe 'search_birds' do
+    it 'returns the bird ids' do
+      expect(described_class.search_birds([2, 4])).to eq([101, 102, 103, 105])
     end
   end
 end

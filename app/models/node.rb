@@ -65,7 +65,11 @@ class Node < ApplicationRecord
     { root_id: nil, lowest_common_ancestor: nil, depth: nil }
   end
 
-  def self.search(node_ids)
+  def self.descendant_ids(node_ids)
     Node.where(id: node_ids).map(&:self_and_descendants).flatten.uniq.map(&:id)
+  end
+
+  def self.search_birds(node_ids)
+    Bird.where(node_id: Node.descendant_ids(node_ids)).uniq.map(&:id).sort
   end
 end
