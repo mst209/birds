@@ -4,6 +4,8 @@ class Node < ApplicationRecord
   extend ActsAsTree::TreeView
   acts_as_tree
 
+  has_many :birds
+
   def parents
     @parents ||= begin
       active_node = self

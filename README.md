@@ -1,6 +1,6 @@
 # README
 
-## Though Process
+## Steps
 1. Setup Boilerplate rails application using `rails new birds-api --api -d postgresql`
 2. Delete extra goodies we don't need (ActionCable, Etc)
 3. Unzip nodes.csv.gz using `gzip -d data/nodes.csv.gz`
@@ -12,8 +12,9 @@
 8. Choose `acts_as_tree` gem to handle self references
 9. Add `parents`, `root`, and `lowest_common_ancestor` methods to the model
 10. Add `rspec` & `rubocop`
-11. Create the api contoller using `rails g controller Nodes`
-
+11. Create the api contoller using `rails g controller CommonAncestors`
+12. Update the `config/routes.rb`
+13. Add the birds model using `rails g model Bird`
 
 ## Model Selection
 Decide between the following ways to model the self referencing relationship

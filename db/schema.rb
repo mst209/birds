@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -12,15 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 20_241_016_143_741) do
+ActiveRecord::Schema[7.1].define(version: 2024_10_17_145902) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension 'plpgsql'
+  enable_extension "plpgsql"
 
-  create_table 'nodes', force: :cascade do |t|
-    t.integer 'parent_id'
-    t.datetime 'created_at', null: false
-    t.datetime 'updated_at', null: false
-    t.index %w[id parent_id], name: 'index_nodes_on_id_and_parent_id'
-    t.index ['parent_id'], name: 'index_nodes_on_parent_id'
+  create_table "birds", force: :cascade do |t|
+    t.integer "node_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "node_id"], name: "index_birds_on_id_and_node_id"
+    t.index ["node_id"], name: "index_birds_on_node_id"
   end
+
+  create_table "nodes", force: :cascade do |t|
+    t.integer "parent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "parent_id"], name: "index_nodes_on_id_and_parent_id"
+    t.index ["parent_id"], name: "index_nodes_on_parent_id"
+  end
+
 end
