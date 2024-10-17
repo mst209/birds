@@ -26,32 +26,21 @@ class Node < ApplicationRecord
     parents.size
   end
 
-  def lowest_common_ancestor(b)
-    return nil if b.nil?
+  def lowest_common_ancestor(another_node)
+    return nil if another_node.nil?
 
-    (parents & b.parents).first
+    (parents & another_node.parents).first
   end
 
   def self.compare(a_id, b_id)
-    a = begin
-      Node.find(a_id)
-    rescue StandardError
-      nil
-    end
-    b = begin
-      Node.find(b_id)
-    rescue StandardError
-      nil
-    end
+    a = Node.find_by_id(a_id)
+    b = Node.find_by_id(b_id)
+
     if !a.nil? && !b.nil?
       lowest_common_ancestor = a.lowest_common_ancestor(b)
-      unless lowest_common_ancestor.nil?
-        root = a.root
-        unless root.nil?
-          depth = a.depth
-          return { root_id: root.id, lowest_common_ancestor: lowest_common_ancestor.id, depth: depth } unless depth.nil?
-        end
-      end
+      root = a.root
+      depth = a.depth
+      return { root_id: root.id, lowest_common_ancestor: lowest_common_ancestor.id, depth: depth } unless lowest_common_ancestor.nil? || root.nil? || depth.nil?
     end
     { root_id: nil, lowest_common_ancestor: nil, depth: nil }
   end

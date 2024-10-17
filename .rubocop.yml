@@ -1,0 +1,76 @@
+require: rubocop-rspec
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Lint/MissingSuper:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 160
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+  Max: 7
+
+Style/NumericLiterals:
+  Enabled: false
+
+Layout/MultilineMethodArgumentLineBreaks:
+  Enabled: true
+
+# Layout/MultilineMethodParameterLineBreaks:
+#   Enabled: true
+
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+
+Layout/MultilineMethodDefinitionBraceLayout:
+  Enabled: true
+  EnforcedStyle: new_line
+
+Layout/FirstMethodParameterLineBreak:
+  Enabled: true
+
+RSpec/ExampleLength:
+  Max: 20
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+Naming/BlockForwarding:
+  EnforcedStyle: explicit
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - 'vendor/**/*'
+    - '.github/**/*'
+    - 'bin/*'
