@@ -54,7 +54,7 @@ flowchart TD
     D((Node 4)) --> F((Node 5))
 
     G((Node 9)) --> H((Node 10))
-    H((Node 10)) --> G((Node 9))
+    H((Node 10)) == Cyclical ==> G((Node 9))
     H((Node 10)) --> I((Node 11))
     I((Node 11)) --> J((Node 12))
     
