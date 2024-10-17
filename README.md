@@ -38,7 +38,7 @@ Decide between the following ways to model the self referencing relationship
 5. Start Server `rails s`
 
 ## Testing
-1. run `bundle exec rspec` to run all tests
+1. run `bundle exec rspec` to run all specs
 
 ### Initial Test Data 
 Initial Test data is provided in the `spec/spec_helper.rb`
