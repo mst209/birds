@@ -42,6 +42,26 @@ Decide between the following ways to model the self referencing relationship
 
 ### Initial Test Data 
 Initial Test data is provided in the `spec/spec_helper.rb`
+```
+def setup_data
+  Node.create!(id: 7, parent_id: 6)
+  Node.create!(id: 6, parent_id: nil)
+  Node.create!(id: 2, parent_id: 7)
+  Node.create!(id: 4, parent_id: 7)
+  Node.create!(id: 8, parent_id: 7)
+  Node.create!(id: 5, parent_id: 4)
+  Node.create!(id: 9, parent_id: 10)
+  Node.create!(id: 10, parent_id: 9)
+  Node.create!(id: 11, parent_id: 10)
+  Node.create!(id: 12, parent_id: 11)
+
+  Bird.create!(id: 101, node_id: 2)
+  Bird.create!(id: 102, node_id: 4)
+  Bird.create!(id: 103, node_id: 5)
+  Bird.create!(id: 104, node_id: 6)
+  Bird.create!(id: 105, node_id: 5)
+end
+```
 
 The data is in the following format
 
