@@ -64,7 +64,7 @@ def setup_data
 end
 ```
 
-The data is in the following format
+### Visualization of Test Data
 
 ```mermaid
 flowchart TD
