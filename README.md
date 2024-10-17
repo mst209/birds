@@ -67,6 +67,12 @@ end
 ### Visualization of Test Data
 
 ```mermaid
+---
+config:
+  layout: dagre
+  look: classic
+  theme: base
+---
 flowchart TD
     classDef err color:#dc3545,stroke:#dc3545,fill:#fac8cd;
     classDef ok color:#35dc89,stroke:#35dc89,fill:#e8ffed;
