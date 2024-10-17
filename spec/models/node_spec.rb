@@ -85,14 +85,19 @@ RSpec.describe Node do
       expect(a.root.id).to eq(6)
     end
 
-    it 'handles cyclical reference and returns a root of 9' do
-      a = described_class.find(10)
-      expect(a.root.id).to eq(11)
-    end
-
-    it 'handles cyclical reference and returns a root of 10' do
+    it 'handles cyclical reference for 9 and returns a root of 10' do
       a = described_class.find(9)
       expect(a.root.id).to eq(10)
+    end
+
+    it 'handles cyclical reference for 12 and returns a root of 9' do
+      a = described_class.find(12)
+      expect(a.root.id).to eq(9)
+    end
+
+    it 'handles cyclical reference for 10 and returns a root of 11' do
+      a = described_class.find(10)
+      expect(a.root.id).to eq(11)
     end
   end
 
