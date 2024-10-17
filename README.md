@@ -28,6 +28,7 @@ Decide between the following ways to model the self referencing relationship
    2. Using `acts_as_sane_tree` allows this recursion to be built into postgres using recursive queries, however I decided not to take this route for various reasons
       1. Recursive queries are harder to read and debug.
       2. May cause unecessary load on the db.
+      3. Down the line this is probally more efficient however i would wrap these recursive queries in stored procures.
 
 ## Getting Started
 1. Clone repo
