@@ -15,6 +15,7 @@
 11. Create the api contoller using `rails g controller CommonAncestors`
 12. Update the `config/routes.rb`
 13. Add the birds model using `rails g model Bird`
+14. Add the birds controller using `rails g controller Birds`
 
 ## Model Selection
 Decide between the following ways to model the self referencing relationship

@@ -10,4 +10,6 @@ Rails.application.routes.draw do
   resources :nodes do
     resources :common_ancestors, only: [:show]
   end
+
+  resources :birds, only: [:index]
 end

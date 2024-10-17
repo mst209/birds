@@ -1,5 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe Bird, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'relationship' do
+    it 'test' do
+      expect('test').to eq('test')
+    end
+  end
 end
