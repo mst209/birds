@@ -30,4 +30,37 @@ Decide between the following ways to model the self referencing relationship
       2. May cause unecessary load on the db.
 
 ## Getting Started
+1. Clone repo
+2. Install the required gems `bundle install`
+3. Create the database `bundle exec rake db:create`
+4. Perform migrations `bundle exec rake db:migrate`
 
+## Testing
+1. run `bundle exec rspec` to run all tests
+
+### Initial Test Data 
+Initial Test data is provided in the `spec/spec_helper.rb`
+
+The data is in the following format
+
+```mermaid
+flowchart TD
+    classDef err color:#dc3545,stroke:#dc3545,fill:#fac8cd;
+    classDef ok color:#35dc89,stroke:#35dc89,fill:#e8ffed;
+    A((Node 6)) -- child --> B((Node 7))
+    B((Node 7)) --> C((Node 2))
+    B((Node 7)) --> D((Node 4))
+    B((Node 7)) --> E((Node 8))
+    D((Node 4)) --> F((Node 5))
+
+    G((Node 9)) --> H((Node 10))
+    H((Node 10)) --> G((Node 9))
+    H((Node 10)) --> I((Node 11))
+    I((Node 11)) --> J((Node 12))
+    
+    C((Node 2)) --> Z{{Bird 101}}:::err
+    D((Node 4)) --> Y{{Bird 102}}:::err
+    F((Node 5)) --> X{{Bird 103}}:::err
+    A((Node 6)) --> W{{Bird 104}}:::err
+    F((Node 5)) --> V{{Bird 105}}:::err
+```

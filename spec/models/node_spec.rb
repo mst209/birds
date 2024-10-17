@@ -4,24 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Node do
   before do
-    described_class.create!(id: 7, parent_id: 6)
-    described_class.create!(id: 6, parent_id: nil)
-    described_class.create!(id: 2, parent_id: 7)
-    described_class.create!(id: 4, parent_id: 7)
-    described_class.create!(id: 5, parent_id: 4)
-    described_class.create!(id: 8, parent_id: 7)
-    described_class.create!(id: 9, parent_id: 10)
-    described_class.create!(id: 10, parent_id: 9)
-    described_class.create!(id: 11, parent_id: 10)
-    described_class.create!(id: 12, parent_id: 11)
-
-    Bird.create!(id: 101, node_id: 2)
-    Bird.create!(id: 102, node_id: 4)
-    Bird.create!(id: 103, node_id: 5)
-    Bird.create!(id: 104, node_id: 6)
-    Bird.create!(id: 105, node_id: 5)
+    setup_data
   end
-
   describe 'self_and_parents' do
     it 'handles non reference of 7, and should return 7,6' do
       a = described_class.find(7)

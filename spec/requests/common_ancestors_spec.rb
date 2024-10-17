@@ -2,11 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'CommonAncestors' do
   before do
-    Node.create!(id: 7, parent_id: 6)
-    Node.create!(id: 6, parent_id: nil)
-    Node.create!(id: 2, parent_id: 7)
-    Node.create!(id: 4, parent_id: 7)
-    Node.create!(id: 5, parent_id: 4)
+    setup_data
   end
 
   let(:blank_response) { { root_id: nil, lowest_common_ancestor: nil, depth: nil } }
