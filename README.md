@@ -1,6 +1,6 @@
 # README
 
-## Steps
+## Steps taken to solve
 1. Setup Boilerplate rails application using `rails new birds-api --api -d postgresql`
 2. Delete extra goodies we don't need (ActionCable, Etc)
 3. Unzip nodes.csv.gz using `gzip -d data/nodes.csv.gz`
@@ -35,6 +35,7 @@ Decide between the following ways to model the self referencing relationship
 2. Install the required gems `bundle install`
 3. Create the database `bundle exec rake db:create`
 4. Perform migrations `bundle exec rake db:migrate`
+5. Start Server `rails s`
 
 ## Testing
 1. run `bundle exec rspec` to run all tests
