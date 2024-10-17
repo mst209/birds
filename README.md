@@ -76,6 +76,12 @@ config:
 flowchart TD
     classDef err color:#dc3545,stroke:#dc3545,fill:#fac8cd;
     classDef ok color:#35dc89,stroke:#35dc89,fill:#e8ffed;
+    subgraph Cyclic
+    G((Node 9)) --> H((Node 10))
+    H((Node 10)) --> I((Node 11))
+    I((Node 11)) --> J((Node 12))
+    J((Node 12)) == Cyclical ==> G((Node 9))
+    end
     subgraph "Acyclic (Normal)"
     A((Node 6)) -- child --> B((Node 7))
     B((Node 7)) --> C((Node 2))
@@ -88,11 +94,5 @@ flowchart TD
     F((Node 5)) --> X{{Bird 103}}:::err
     A((Node 6)) --> W{{Bird 104}}:::err
     F((Node 5)) --> V{{Bird 105}}:::err
-    end
-    subgraph Cyclic
-    G((Node 9)) --> H((Node 10))
-    H((Node 10)) --> I((Node 11))
-    I((Node 11)) --> J((Node 12))
-    J((Node 12)) == Cyclical ==> G((Node 9))
     end
 ```
