@@ -6,6 +6,7 @@ RSpec.describe Node do
   before do
     setup_data
   end
+
   describe 'self_and_parents' do
     it 'handles non reference of 7, and should return 7,6' do
       a = described_class.find(7)
@@ -14,7 +15,7 @@ RSpec.describe Node do
 
     it 'handles cyclical reference of 10, and should return 9,10,11,12' do
       a = described_class.find(10)
-      expect(a.self_and_parents.map(&:id)).to contain_exactly(9,10,11,12)
+      expect(a.self_and_parents.map(&:id)).to contain_exactly(9, 10, 11, 12)
     end
   end
 
