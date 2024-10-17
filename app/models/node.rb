@@ -30,7 +30,7 @@ class Node < ApplicationRecord
 
   def descendants(visited = Set.new)
     return [] if visited.include?(self)
-  
+
     visited.add(self)
     children.each_with_object([]) do |child, arr|
       arr << child
@@ -64,8 +64,6 @@ class Node < ApplicationRecord
     end
     { root_id: nil, lowest_common_ancestor: nil, depth: nil }
   end
-
-  
 
   def self.search(node_ids)
     Node.where(id: node_ids).map(&:self_and_descendants).flatten.uniq.map(&:id)

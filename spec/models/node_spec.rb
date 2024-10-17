@@ -4,41 +4,39 @@ require 'rails_helper'
 
 RSpec.describe Node do
   before do
-    Node.create!(id: 7, parent_id: 6)
-    Node.create!(id: 6, parent_id: nil)
-    Node.create!(id: 2, parent_id: 7)
-    Node.create!(id: 4, parent_id: 7)
-    Node.create!(id: 5, parent_id: 4)
-    Node.create!(id: 8, parent_id: 7)
-    Node.create!(id: 9, parent_id: 10)
-    Node.create!(id: 10, parent_id: 9)
-    Node.create!(id: 11, parent_id: 10)
-    Node.create!(id: 12, parent_id: 11)
+    described_class.create!(id: 7, parent_id: 6)
+    described_class.create!(id: 6, parent_id: nil)
+    described_class.create!(id: 2, parent_id: 7)
+    described_class.create!(id: 4, parent_id: 7)
+    described_class.create!(id: 5, parent_id: 4)
+    described_class.create!(id: 8, parent_id: 7)
+    described_class.create!(id: 9, parent_id: 10)
+    described_class.create!(id: 10, parent_id: 9)
+    described_class.create!(id: 11, parent_id: 10)
+    described_class.create!(id: 12, parent_id: 11)
   end
 
   describe 'self_and_parents' do
-
     it 'handles non reference of 7, and should return 7,6' do
       a = described_class.find(7)
-      expect(a.self_and_parents.map(&:id)).to match_array([7,6])
+      expect(a.self_and_parents.map(&:id)).to contain_exactly(7, 6)
     end
-   
+
     it 'handles cyclical reference of 10, and should return 9,10,11,12' do
       a = described_class.find(10)
-      expect(a.self_and_parents.map(&:id)).to match_array([9,10])
+      expect(a.self_and_parents.map(&:id)).to contain_exactly(9, 10)
     end
   end
 
   describe 'self_and_descendants' do
-
     it 'handles non-cyclical reference of 6, and should return 9,10,11,12' do
       a = described_class.find(6)
-      expect(a.self_and_descendants.map(&:id)).to match_array([2,4,5,6,7,8])
+      expect(a.self_and_descendants.map(&:id)).to contain_exactly(2, 4, 5, 6, 7, 8)
     end
-   
+
     it 'handles cyclical reference of 10, and should return 9,10,11,12' do
       a = described_class.find(10)
-      expect(a.self_and_descendants.map(&:id)).to match_array([9,10,11,12])
+      expect(a.self_and_descendants.map(&:id)).to contain_exactly(9, 10, 11, 12)
     end
   end
 
@@ -72,6 +70,7 @@ RSpec.describe Node do
       b = described_class.find(11)
       expect(a.lowest_common_ancestor(b).id).to eq(9)
     end
+
     it 'handles cyclical reference of 10 and 11 should return 10' do
       a = described_class.find(10)
       b = described_class.find(11)
