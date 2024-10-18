@@ -60,8 +60,8 @@ class Node < ApplicationRecord
 
   sig{ params(a_id: Integer, b_id: Integer).returns(T::Hash[Symbol, T.untyped]) }
   def self.compare(a_id, b_id)
-    a = Node.find_by(a_id)
-    b = Node.find_by(b_id)
+    a = Node.find_by_id(a_id)
+    b = Node.find_by_id(b_id)
 
     if !a.nil? && !b.nil?
       lowest_common_ancestor = a.lowest_common_ancestor(b)
