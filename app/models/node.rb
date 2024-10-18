@@ -14,7 +14,7 @@ class Node < ApplicationRecord
 
   sig{ returns(T::Array[Node]) }
   def parents
-    @parents = begin
+    @parents ||= begin
       active_node = self
       parent_nodes = []
       until active_node.nil?
