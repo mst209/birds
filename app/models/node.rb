@@ -2,9 +2,9 @@
 # typed: strict
 
 class Node < ApplicationRecord
-  extend ActsAsTree::TreeView
-  acts_as_tree
 
+  belongs_to :direct_parent, :class_name => "Node", :foreign_key => :parent_id, :optional => true
+  has_many :children, :class_name => "Node", :foreign_key => :parent_id
   has_many :birds
 
   sig { returns(T::Array[Node]) }
@@ -12,13 +12,20 @@ class Node < ApplicationRecord
     ([self] + parents).uniq
   end
 
+  sig { returns(T.nilable(Node))}
+  def parent
+    T.let(direct_parent, T.nilable(Node))
+  end
+
   sig { returns(T::Array[Node]) }
   def parents
     active_node = T.let(self, T.nilable(Node))
     parent_nodes = []
     until active_node.nil?
+      break if active_node.parent.nil?
+
       active_node = active_node.parent
-      break if parent_nodes.include?(active_node) || active_node.nil? # Break on recursion or nil
+      break if parent_nodes.include?(active_node)
 
       parent_nodes.push(active_node)
     end
@@ -48,20 +55,20 @@ class Node < ApplicationRecord
 
   sig{ returns(Integer) }
   def depth
-    self.class.module_parents.size
+    self_and_parents.size
   end
 
-  sig{ params(another_node: Node).returns(T.nilable(Node)) }
+  sig{ params(another_node: T.self_type).returns(T.nilable(Node)) }
   def lowest_common_ancestor(another_node)
     return nil if another_node.nil?
 
-    (self.class.module_parents & another_node.class.module_parents).first
+    (self_and_parents & another_node.self_and_parents).first
   end
 
   sig{ params(a_id: Integer, b_id: Integer).returns(T::Hash[Symbol, T.untyped]) }
   def self.compare(a_id, b_id)
-    a = Node.find_by_id(a_id)
-    b = Node.find_by_id(b_id)
+    a = Node.find_by(id: a_id)
+    b = Node.find_by(id: b_id)
 
     if !a.nil? && !b.nil?
       lowest_common_ancestor = a.lowest_common_ancestor(b)
