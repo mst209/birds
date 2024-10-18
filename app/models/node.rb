@@ -7,12 +7,6 @@ class Node < ApplicationRecord
 
   has_many :birds
 
-  sig { void }
-  def initialize
-    @parents = T.let(nil, T.nilable(T::Array[Node]))
-    super
-  end
-
   sig { returns(T::Array[Node]) }
   def self_and_parents
     ([self] + parents).uniq
@@ -20,17 +14,15 @@ class Node < ApplicationRecord
 
   sig { returns(T::Array[Node]) }
   def parents
-    @parents ||= begin
-      active_node = self
-      parent_nodes = []
-      until active_node.nil?
-        active_node = active_node.parents
-        break if parent_nodes.include?(active_node) || active_node.nil? # Break on recursion or nil
+    active_node = T.let(self, T.nilable(Node))
+    parent_nodes = []
+    until active_node.nil?
+      active_node = active_node.parent
+      break if parent_nodes.include?(active_node) || active_node.nil? # Break on recursion or nil
 
-        parent_nodes.push(active_node)
-      end
-      parent_nodes
+      parent_nodes.push(active_node)
     end
+    parent_nodes
   end
 
   sig{ returns(T::Array[Node]) }
