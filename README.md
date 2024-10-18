@@ -18,6 +18,9 @@
 14. Add the birds controller using `rails g controller Birds`
 15. Use Rubocop to clean up code
 16. Add specs to handle cyclical trees.
+17. Adding Strong Typing
+    1.  Install sorbet gems `sorbet`, `sorbet-runtime`, `tapioca`
+    2.  Initialize Tapioca `bundle exec tapioca init`
 
 ## Model Selection
 Decide between the following ways to model the self referencing relationship
