@@ -3,16 +3,22 @@
 
 class Node < ApplicationRecord
   extend ActsAsTree::TreeView
-  acts_like?
+  acts_as_tree
 
   has_many :birds
 
-  sig{ returns(T::Array[Node]) }
+  sig { void }
+  def initialize
+    @parents = T.let(nil, T.nilable(T::Array[Node]))
+    super
+  end
+
+  sig { returns(T::Array[Node]) }
   def self_and_parents
     ([self] + parents).uniq
   end
 
-  sig{ returns(T::Array[Node]) }
+  sig { returns(T::Array[Node]) }
   def parents
     @parents ||= begin
       active_node = self
@@ -32,7 +38,7 @@ class Node < ApplicationRecord
     ([self] + descendants).uniq
   end
 
-  sig{ returns(T::Array[Node]) }
+  sig{ params(visited: T::Set[Node]).returns(T::Array[Node]) }
   def descendants(visited = Set.new)
     return [] if visited.include?(self)
 
