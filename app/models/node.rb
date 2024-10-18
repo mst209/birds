@@ -11,7 +11,7 @@ class Node < ApplicationRecord
   end
 
   def parents
-    @parents = begin
+    @parents ||= begin
       active_node = self
       parent_nodes = []
       until active_node.nil?
