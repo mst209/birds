@@ -1,55 +1,40 @@
 # frozen_string_literal: true
 
 class Node < ApplicationRecord
-  extend ActsAsTree::TreeView
-  acts_as_tree
 
   has_many :birds
 
-  def self_and_parents
-    ([self] + parents).uniq
+  def self_and_ancestors
+    Node.joins("join get_ancestors_and_self(#{self.id}) ancestors on nodes.id = ancestors.id").order("ancestors.depth")
   end
 
-  def parents
-    @parents ||= begin
-      active_node = self
-      parent_nodes = []
-      until active_node.nil?
-        active_node = active_node.parent
-        break if parent_nodes.include?(active_node) || active_node.nil? # Break on recursion or nil
-
-        parent_nodes.push(active_node)
-      end
-      parent_nodes
-    end
+  def ancestors
+    Node.joins("join get_ancestors(#{self.id}) ancestors on nodes.id = ancestors.id").order("ancestors.depth")
   end
 
   def self_and_descendants
-    ([self] + descendants).uniq
+    Node.joins("join get_descendants_and_self(#{self.id}) ancestors on nodes.id = ancestors.id").order("ancestors.depth")
   end
 
-  def descendants(visited = Set.new)
-    return [] if visited.include?(self)
-
-    visited.add(self)
-    children.each_with_object([]) do |child, arr|
-      arr << child
-      arr.concat(child.descendants(visited))
-    end
+  def descendants
+    Node.joins("join get_descendants(#{self.id}) descendants on nodes.id = descendants.id").order("descendants.depth")
   end
 
   def root
-    self_and_parents.last
+    self_and_ancestors.last
   end
 
   def depth
-    self_and_parents.size
+    self_and_ancestors.count
+  end
+
+  def common_ancestors(another_node)
+    self_and_ancestors.joins("join get_ancestors_and_self(#{another_node.id}) ancestors2 on ancestors.id = ancestors2.id").order("ancestors.depth")
   end
 
   def lowest_common_ancestor(another_node)
     return nil if another_node.nil?
-
-    (self_and_parents & another_node.self_and_parents).first
+    common_ancestors(another_node).first
   end
 
   def self.compare(a_id, b_id)
@@ -58,11 +43,9 @@ class Node < ApplicationRecord
 
     if !a.nil? && !b.nil?
       lowest_common_ancestor = a.lowest_common_ancestor(b)
-      root = a.root
-      depth = a.depth
-      return { root_id: root.id, lowest_common_ancestor: lowest_common_ancestor.id, depth: depth } unless lowest_common_ancestor.nil? || root.nil? || depth.nil?
+      return { root_id: lowest_common_ancestor.root.id, lowest_common_ancestor: lowest_common_ancestor.id, depth: lowest_common_ancestor.depth } unless lowest_common_ancestor.nil?
     end
-    { root_id: nil, lowest_common_ancestor: nil, depth: nil }
+    { root_id: nil, lowest_common_ancestor: nil, depth: nil}
   end
 
   def self.descendant_ids(node_ids)

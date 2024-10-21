@@ -9,26 +9,22 @@
 6. Create the table using `bundle exec rake db:migrate`
    * Note, I decided not to use foreign key constraints as in the future we may need to add children before their parents.
 7. Seed the initial data using `rails db:seed`
-8. Choose `acts_as_tree` gem to handle self references
-9. Add `parents`, `root`, and `lowest_common_ancestor` methods to the model
-10. Add `rspec` & `rubocop`
-11. Create the api contoller using `rails g controller CommonAncestors`
-12. Update the `config/routes.rb`
-13. Add the birds model using `rails g model Bird`
-14. Add the birds controller using `rails g controller Birds`
-15. Use Rubocop to clean up code
-16. Add specs to handle cyclical trees.
+8. Write Recursive CTE functions to efficiently traverse trees.
+9. Use `fx` gem to facilitate migrations of CTE functions
+10. Add `parents`, `root`, and `lowest_common_ancestor` methods to the model
+11. Add `rspec` & `rubocop`
+12. Create the api contoller using `rails g controller CommonAncestors`
+13. Update the `config/routes.rb`
+14. Add the birds model using `rails g model Bird`
+15. Add the birds controller using `rails g controller Birds`
+16. Use Rubocop to clean up code
+17. Add specs to handle cyclical trees.
 
-## Model Selection
-Decide between the following ways to model the self referencing relationship
-   1. Using `acts_as_tree` gem provides the following out of the box
-      1. `parent` and `children` relationships
-      2. `descendants`, `self_and_descendants`, `parents`, and `self_and_parents` instance methods
-      3. While testing i encountered and error when processing cyclical branches. To fix this i modified the implementation of `parents` and `descendents` to handle cyclical relationships
-   2. Using `acts_as_sane_tree` allows this recursion to be built into postgres using recursive queries, however I decided not to take this route for various reasons
-      1. Recursive queries are harder to read and debug.
-      2. May cause unecessary load on the db.
-      3. Down the line this is probally more efficient however i would wrap these recursive queries in stored procures.
+## Recursive CTE Functions
+* [get_ancestors(node_id)](birds/db/functions/get_ancestors_v01.sql)
+* [get_ancestors_and_self(node_id)](birds/db/functions/get_ancestors_and_self_v01.sql)
+* [get_descendants(node_id)](birds/db/functions/get_descendants_v01.sql)
+* [get_descendants_and_self(node_id)](birds/db/functions/get_descendants_and_self_v01.sql)
 
 ## Getting Started
 1. Clone repo
@@ -63,6 +59,7 @@ def setup_data
   Bird.create!(id: 105, node_id: 5)
 end
 ```
+
 
 ### Visualization of Test Data
 

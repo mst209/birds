@@ -7,15 +7,15 @@ RSpec.describe Node do
     setup_data
   end
 
-  describe 'self_and_parents' do
+  describe 'self_and_ancestors' do
     it 'handles non reference of 7, and should return 7,6' do
       a = described_class.find(7)
-      expect(a.self_and_parents.map(&:id)).to contain_exactly(7, 6)
+      expect(a.self_and_ancestors.map(&:id)).to contain_exactly(7, 6)
     end
 
     it 'handles cyclical reference of 10, and should return 9,10,11,12' do
       a = described_class.find(10)
-      expect(a.self_and_parents.map(&:id)).to contain_exactly(9, 10, 11, 12)
+      expect(a.self_and_ancestors.map(&:id)).to contain_exactly(9, 10, 11, 12)
     end
   end
 
@@ -137,13 +137,13 @@ RSpec.describe Node do
     end
 
     it 'siblings' do
-      expect(described_class.compare(4, 2)).to eq({ root_id: 6, lowest_common_ancestor: 7, depth: 3 })
-      expect(described_class.compare(2, 4)).to eq({ root_id: 6, lowest_common_ancestor: 7, depth: 3 })
+      expect(described_class.compare(4, 2)).to eq({ root_id: 6, lowest_common_ancestor: 7, depth: 2 })
+      expect(described_class.compare(2, 4)).to eq({ root_id: 6, lowest_common_ancestor: 7, depth: 2 })
     end
 
     it 'parent / child' do
       expect(described_class.compare(4, 5)).to eq({ root_id: 6, lowest_common_ancestor: 4, depth: 3 })
-      expect(described_class.compare(5, 4)).to eq({ root_id: 6, lowest_common_ancestor: 4, depth: 4 })
+      expect(described_class.compare(5, 4)).to eq({ root_id: 6, lowest_common_ancestor: 4, depth: 3 })
     end
 
     it 'cyclical / child' do
