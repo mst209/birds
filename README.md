@@ -20,6 +20,23 @@
 16. Use Rubocop to clean up code
 17. Add specs to handle cyclical trees.
 
+## Comments on Efficiency and Scalability
+In order for this to scale effectively, the goal is to move as much of the logic into Postgres, and out of active record.
+
+By joining window functions (that return recursive CTE's) inside of active record we get the best of both worlds, Highly efficient recursion inside of postgres, and sql composition to easility access the data inside of active record.
+
+For example: Calling `node_a.lowest_common_ancestor(node_b)` joins ancestors of each and returns the first result without having to make subsequent calls to the database.
+
+```
+> Node.compare(5497637, 4430546)
+  Node Load (1.8ms)  SELECT "nodes".* FROM "nodes" WHERE "nodes"."id" = $1 LIMIT $2  [["id", 5497637], ["LIMIT", 1]] # Find record with id = 5497637
+  Node Load (0.4ms)  SELECT "nodes".* FROM "nodes" WHERE "nodes"."id" = $1 LIMIT $2  [["id", 4430546], ["LIMIT", 1]] # Find record with id = 4430546
+  Node Load (2.9ms)  SELECT "nodes".* FROM "nodes" join get_ancestors_and_self(5497637) ancestors on nodes.id = ancestors.id join get_ancestors_and_self(4430546) ancestors2 on ancestors.id = ancestors2.id ORDER BY ancestors.depth LIMIT $1 # Find Lowest Common Ancestor (Record 4430546), by joining 2 window function inside of postgres
+  Node Load (0.8ms)  SELECT "nodes".* FROM "nodes" join get_ancestors_and_self(130) ancestors on nodes.id = ancestors.id ORDER BY ancestors.depth DESC LIMIT $1  [["LIMIT", 1]] # Once lowest common ancestor is initialized, we make a subsequesnt call to find the root
+  Node Count (0.7ms)  SELECT COUNT(*) FROM "nodes" join get_ancestors_and_self(130) ancestors on nodes.id = ancestors.id # And one more call to find the depth
+
+*** Note this can be combined into one query, however since only one row is being returned and initialized in the ruby runtime there is minimal performance gain of aggrigating this inside one postgres function
+```
 ## Recursive CTE Functions
 * [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
 * [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
