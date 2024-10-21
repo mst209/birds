@@ -21,10 +21,10 @@
 17. Add specs to handle cyclical trees.
 
 ## Recursive CTE Functions
-* [get_ancestors(node_id)](birds/db/functions/get_ancestors_v01.sql)
-* [get_ancestors_and_self(node_id)](birds/db/functions/get_ancestors_and_self_v01.sql)
-* [get_descendants(node_id)](birds/db/functions/get_descendants_v01.sql)
-* [get_descendants_and_self(node_id)](birds/db/functions/get_descendants_and_self_v01.sql)
+* [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
+* [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
+* [get_descendants(node_id)](db/functions/get_descendants_v01.sql)
+* [get_descendants_and_self(node_id)](db/functions/get_descendants_and_self_v01.sql)
 
 ## Getting Started
 1. Clone repo
