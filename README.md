@@ -23,7 +23,7 @@
 ## Comments on Efficiency and Scalability
 In order for this to scale effectively, the goal is to move as much of the logic into Postgres, and out of active record.
 
-By joining window functions (that return recursive CTE's) inside of active record we get the best of both worlds, Highly efficient recursion inside of postgres, and sql composition to easility access the data inside of active record.
+By joining window functions (that return recursive CTE's) inside of active record we get the best of both worlds, Highly efficient recursion inside of postgres, and sql composition to easily initialize the objects when we need them.
 
 For example: Calling `node_a.lowest_common_ancestor(node_b)` joins ancestors of each and returns the first result without having to make subsequent calls to the database.
 
@@ -39,6 +39,24 @@ The optimizer is able to see through the function boundry and utilize the indexe
 
 *** Note this can be combined into one query, however since only one row is being returned and initialized in the ruby runtime there is marginal performance gain of aggrigating this inside one postgres function
 ```
+
+Query Plan
+```
+Sort  (cost=35.01..35.14 rows=50 width=32)
+  Sort Key: ancestors.depth
+  ->  Hash Join  (cost=14.35..33.60 rows=50 width=32)
+        Hash Cond: (ancestors2.id = nodes.id)
+        ->  Function Scan on get_ancestors_and_self ancestors2  (cost=0.25..10.25 rows=1000 width=8)
+        ->  Hash  (cost=13.98..13.98 rows=10 width=40)
+              ->  Hash Join  (cost=1.29..13.98 rows=10 width=40)
+                    Hash Cond: (ancestors.id = nodes.id)
+                    ->  Function Scan on get_ancestors_and_self ancestors  (cost=0.25..10.25 rows=1000 width=12)
+                    ->  Hash  (cost=1.02..1.02 rows=2 width=28)
+                          ->  Seq Scan on nodes  (cost=0.00..1.02 rows=2 width=28)
+```
+
+** Hash joins parallelize and scale better than any other join, allowing us to take advantage of postgres parellel query functionality on large data sets (configuration required)
+
 ## Recursive CTE Functions
 * [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
 * [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
