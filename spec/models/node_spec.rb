@@ -151,12 +151,6 @@ RSpec.describe Node do
     end
   end
 
-  describe 'descendant_ids' do
-    it 'returns the node ids given and their decendents' do
-      expect(described_class.descendant_ids([2, 4])).to eq([2, 4, 5])
-    end
-  end
-
   describe 'search_birds' do
     it 'returns the bird ids' do
       expect(described_class.search_birds([2, 4])).to eq([101, 102, 103, 105])

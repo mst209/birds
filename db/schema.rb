@@ -214,4 +214,33 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
       END;
       $function$
   SQL
+  create_function :get_birds, sql_definition: <<-SQL
+      CREATE OR REPLACE FUNCTION public.get_birds(node_ids integer[])
+       RETURNS TABLE(id bigint)
+       LANGUAGE plpgsql
+      AS $function$
+      BEGIN
+        RETURN QUERY
+        WITH RECURSIVE node_descendants AS (
+          -- Base case: start with the given nodes (start_ids)
+          SELECT nodes.id, nodes.parent_id, ARRAY[nodes.id] AS path
+          FROM nodes
+          WHERE nodes.id = ANY(node_ids)
+      #{'    '}
+          UNION ALL
+      #{'    '}
+          -- Recursive step: select children of each node found so far
+          SELECT t.id, t.parent_id, td.path || t.id
+          FROM nodes t
+          INNER JOIN node_descendants td ON t.parent_id = td.id
+          -- Stop recursion if we've already visited this node (to prevent loops)
+          WHERE NOT t.id = ANY(td.path)
+        )
+        -- Return distinct descendants excluding the start nodes
+        SELECT DISTINCT b.id
+        FROM node_descendants nd
+        JOIN birds b on b.node_id = nd.id;
+      END;
+      $function$
+  SQL
 end
