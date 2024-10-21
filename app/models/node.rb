@@ -5,6 +5,7 @@ class Node < ApplicationRecord
   has_many :birds
 
   def self_and_ancestors
+    # to_do: parameratize inputs 
     Node.joins("join get_ancestors_and_self(#{self.id}) ancestors on nodes.id = ancestors.id").order("ancestors.depth")
   end
 
