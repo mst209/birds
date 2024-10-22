@@ -61,7 +61,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
   - More difficult implimentation into active record
   - Will be sort of hard to maintain in the codebase, can lead to ugly code
 - Notes: 
-  - Wrapping CTE's into functions that return tables make them easier to implement
+  - Wrapping CTE's into functions that return tables make them easier to implement, however harder to analyze.
     - [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
     - [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
     - [get_descendants(node_id)](db/functions/get_descendants_v01.sql)
