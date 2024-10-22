@@ -2,6 +2,7 @@ class Bird < ApplicationRecord
   belongs_to :node
 
   def self.search_by_node_ids(node_ids)
+    # To-do Move this to a "Search" service as it shares concerns from 2 models
     Bird.with(
       :recursive,
       node_descendants: "
