@@ -1,5 +1,5 @@
-class CreateFunctionGetBirds < ActiveRecord::Migration[7.1]
+class CreateFunctionGetDescenantBirds < ActiveRecord::Migration[7.1]
   def change
-    create_function :descendant_birds
+    create_function :get_descendant_birds
   end
 end

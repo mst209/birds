@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION descendant_birds(node_ids INTEGER[])
+CREATE OR REPLACE FUNCTION get_descendant_birds(node_ids INTEGER[])
 RETURNS TABLE(id BIGINT) AS $$
 BEGIN
   RETURN QUERY

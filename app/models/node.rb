@@ -53,6 +53,6 @@ class Node < ApplicationRecord
   end
 
   def self.search_birds(node_ids)
-    Bird.joins("join descendant_birds(ARRAY[#{node_ids.join(',')}]) b on birds.id = b.id").order(:id).map(&:id)
+    Bird.joins("join get_descendant_birds(ARRAY[#{node_ids.join(',')}]) b on birds.id = b.id").order(:id).map(&:id)
   end
 end
