@@ -62,7 +62,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
   - Can lead to some ugly CTE Code
   
 - Notes: 
-  - Wrapping CTE's in functions that return tables make them more efficient but difficult to work on.
+  - Wrapping CTE's in functions that return tables make them a little more efficient, and composable, but difficult to optimize.
     - [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
     - [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
     - [get_descendants(node_id)](db/functions/get_descendants_v01.sql)
