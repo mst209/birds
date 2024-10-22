@@ -12,34 +12,34 @@
 
 ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension 'ltree'
-  enable_extension 'plpgsql'
+  enable_extension "ltree"
+  enable_extension "plpgsql"
 
-  create_table 'birds', force: :cascade do |t|
-    t.integer 'node_id'
-    t.datetime 'created_at', null: false
-    t.datetime 'updated_at', null: false
-    t.index %w[id node_id], name: 'index_birds_on_id_and_node_id'
-    t.index ['node_id'], name: 'index_birds_on_node_id'
+  create_table "birds", force: :cascade do |t|
+    t.integer "node_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "node_id"], name: "index_birds_on_id_and_node_id"
+    t.index ["node_id"], name: "index_birds_on_node_id"
   end
 
-  create_table 'nodes', force: :cascade do |t|
-    t.integer 'parent_id'
-    t.datetime 'created_at', null: false
-    t.datetime 'updated_at', null: false
-    t.index %w[id parent_id], name: 'index_nodes_on_id_and_parent_id'
-    t.index ['parent_id'], name: 'index_nodes_on_parent_id'
+  create_table "nodes", force: :cascade do |t|
+    t.integer "parent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "parent_id"], name: "index_nodes_on_id_and_parent_id"
+    t.index ["parent_id"], name: "index_nodes_on_parent_id"
   end
 
-  create_table 'tree', id: :integer, default: nil, force: :cascade do |t|
-    t.integer 'parent_id'
+  create_table "tree", id: :integer, default: nil, force: :cascade do |t|
+    t.integer "parent_id"
   end
 
-  create_table 'tree2', id: :integer, default: nil, force: :cascade do |t|
-    t.ltree 'path'
+  create_table "tree2", id: :integer, default: nil, force: :cascade do |t|
+    t.ltree "path"
   end
 
-  create_function :get_ancestors, sql_definition: <<-SQL
+  create_function :get_ancestors, sql_definition: <<-'SQL'
       CREATE OR REPLACE FUNCTION public.get_ancestors(node_id integer)
        RETURNS TABLE(id bigint, depth integer)
        LANGUAGE plpgsql
@@ -51,9 +51,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
           SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
           FROM nodes n1
           WHERE n1.id = node_id
-      #{'    '}
+          
           UNION ALL
-      #{'    '}
+          
           -- Recursively select parents
           SELECT t.id, t.parent_id, ta.depth + 1, ta.path || t.id
           FROM nodes t
@@ -68,7 +68,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
       END;
       $function$
   SQL
-  create_function :get_descendants, sql_definition: <<-SQL
+  create_function :get_descendants, sql_definition: <<-'SQL'
       CREATE OR REPLACE FUNCTION public.get_descendants(node_id integer)
        RETURNS TABLE(id bigint, depth integer)
        LANGUAGE plpgsql
@@ -80,9 +80,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
           SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
           FROM nodes n1
           WHERE n1.id = node_id
-      #{'    '}
+          
           UNION ALL
-      #{'    '}
+          
           -- Recursive step: select children of each node found so far
           SELECT t.id, t.parent_id, td.depth + 1, td.path || t.id
           FROM nodes t
@@ -97,7 +97,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
       END;
       $function$
   SQL
-  create_function :lowest_common_ancestor, sql_definition: <<-SQL
+  create_function :lowest_common_ancestor, sql_definition: <<-'SQL'
       CREATE OR REPLACE FUNCTION public.lowest_common_ancestor(node1 integer, node2 integer)
        RETURNS TABLE(root integer, lowest_common_ancestor integer, depth integer)
        LANGUAGE plpgsql
@@ -107,7 +107,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
         WITH recursive ancestors_node1 AS (
           -- Base case: Start with node1 and depth 0
           SELECT * from get_ancestors(node1)
-      #{'    '}
+          
         ),
         ancestors_node2 AS (
           SELECT * from get_ancestors(node2)
@@ -119,7 +119,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
           INNER JOIN ancestors_node2 an2 ON an1.id = an2.id
         )
         -- Select the root of node1 and the lowest common ancestor
-        SELECT#{' '}
+        SELECT 
           -- The root is the ancestor of node1 with the highest depth (max depth in node1's ancestors)
           (SELECT id FROM ancestors_node1 ORDER BY ancestors_node1.depth DESC LIMIT 1) AS root,
           -- The lowest common ancestor is the common ancestor with the highest depth
@@ -137,7 +137,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
       END;
       $function$
   SQL
-  create_function :get_ancestors_and_self, sql_definition: <<-SQL
+  create_function :get_ancestors_and_self, sql_definition: <<-'SQL'
       CREATE OR REPLACE FUNCTION public.get_ancestors_and_self(node_id integer)
        RETURNS TABLE(id bigint, depth integer)
        LANGUAGE plpgsql
@@ -149,9 +149,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
           SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
           FROM nodes n1
           WHERE n1.id = node_id
-      #{'    '}
+          
           UNION ALL
-      #{'    '}
+          
           -- Recursively select parents
           SELECT t.id, t.parent_id, ta.depth + 1, ta.path || t.id
           FROM nodes t
@@ -165,7 +165,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
       END;
       $function$
   SQL
-  create_function :get_descendants_and_self, sql_definition: <<-SQL
+  create_function :get_descendants_and_self, sql_definition: <<-'SQL'
       CREATE OR REPLACE FUNCTION public.get_descendants_and_self(node_id integer)
        RETURNS TABLE(id bigint, depth integer)
        LANGUAGE plpgsql
@@ -177,9 +177,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
           SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
           FROM nodes n1
           WHERE n1.id = node_id
-      #{'    '}
+          
           UNION ALL
-      #{'    '}
+          
           -- Recursive step: select children of each node found so far
           SELECT t.id, t.parent_id, td.depth + 1, td.path || t.id
           FROM nodes t
@@ -193,7 +193,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
       END;
       $function$
   SQL
-  create_function :get_lowest_common_ancestor, sql_definition: <<-SQL
+  create_function :get_lowest_common_ancestor, sql_definition: <<-'SQL'
       CREATE OR REPLACE FUNCTION public.get_lowest_common_ancestor(node1_id integer, node2_id integer)
        RETURNS bigint
        LANGUAGE plpgsql
@@ -214,7 +214,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
       END;
       $function$
   SQL
-  create_function :get_birds, sql_definition: <<-SQL
+  create_function :get_birds, sql_definition: <<-'SQL'
       CREATE OR REPLACE FUNCTION public.get_birds(node_ids integer[])
        RETURNS TABLE(id bigint)
        LANGUAGE plpgsql
@@ -226,9 +226,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
           SELECT nodes.id, nodes.parent_id, ARRAY[nodes.id] AS path
           FROM nodes
           WHERE nodes.id = ANY(node_ids)
-      #{'    '}
+          
           UNION ALL
-      #{'    '}
+          
           -- Recursive step: select children of each node found so far
           SELECT t.id, t.parent_id, td.path || t.id
           FROM nodes t
@@ -243,4 +243,5 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_21_234132) do
       END;
       $function$
   SQL
+
 end

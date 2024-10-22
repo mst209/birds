@@ -57,14 +57,14 @@ Sort  (cost=35.01..35.14 rows=50 width=32)
 
 Query Plan for `search_birds`
 ```
-EXPLAIN SELECT "birds".* FROM "birds" join get_birds(ARRAY[7]) b on birds.id = b.id ORDER BY "birds"."id" ASC
+EXPLAIN SELECT "birds".* FROM "birds" join get_descendant_birds(ARRAY[7]) b on birds.id = b.id ORDER BY "birds"."id" ASC
                                    QUERY PLAN
 --------------------------------------------------------------------------------
  Sort  (cost=105.34..107.84 rows=1000 width=28)
    Sort Key: birds.id
    ->  Hash Join  (cost=42.88..55.51 rows=1000 width=28)
          Hash Cond: (b.id = birds.id)
-         ->  Function Scan on get_birds b  (cost=0.25..10.25 rows=1000 width=8)
+         ->  Function Scan on get_descendant_birds b  (cost=0.25..10.25 rows=1000 width=8)
          ->  Hash  (cost=24.50..24.50 rows=1450 width=28)
                ->  Seq Scan on birds  (cost=0.00..24.50 rows=1450 width=28)
 ```
@@ -76,7 +76,7 @@ EXPLAIN SELECT "birds".* FROM "birds" join get_birds(ARRAY[7]) b on birds.id = b
 * [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
 * [get_descendants(node_id)](db/functions/get_descendants_v01.sql)
 * [get_descendants_and_self(node_id)](db/functions/get_descendants_and_self_v01.sql)
-* [get_birds(node_ids)](db/functions/get_birds_v01.sql)
+* [get_descendant_birds(node_ids)](db/functions/get_descendant_birds_v01.sql)
 
 ## Getting Started
 1. Clone repo
