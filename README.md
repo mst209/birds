@@ -210,7 +210,7 @@ CDC (Change Data Capture) Can be setup on the nodes table and publish events for
       
 - Cons: 
   - More complicated to setup
-  - Graph DB can get out of sync
+  - Graph DB can lag slightly if queues back up
   - Difficult to implement into active record
 
 ```mermaid
