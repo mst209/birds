@@ -9,8 +9,9 @@
 6. Create the table using `bundle exec rake db:migrate`
    * Note, I decided not to use foreign key constraints as in the future we may need to add children before their parents.
 7. Seed the initial data using `rails db:seed`
+   1. Based on data it is clear that foreign keys should not be used, therefor they have been omitted.
 8. Write Recursive CTE functions to efficiently traverse trees.
-9. Use `fx` gem to facilitate migrations of CTE functions
+9.  Use `fx` gem to facilitate migrations of CTE functions
 10. Add `ancestors`, `self_and_ancestors`, `descendents`, `self_and_descendents`, `common_ancestors`, `root`, `depth`, and `lowest_common_ancestor` methods to the model
 11. Add `rspec` & `rubocop`
 12. Create the api contoller using `rails g controller CommonAncestors`
@@ -21,7 +22,7 @@
 17. Add specs to handle cyclical trees.
 
 ## Comments on Efficiency and Scalability
-In order for this to scale effectively, the goal is to move as much of the logic into Postgres, and out of active record.
+In order for this to scale effectively, the goal is to move as much of the recursive logic into Postgres, and out of active record.
 
 By joining window functions (that return recursive CTE's) inside of active record we get the best of both worlds, Highly efficient recursion inside of postgres, and sql composition to easily initialize the objects when we need them.
 
