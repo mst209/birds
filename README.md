@@ -40,7 +40,6 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
     - Initializing Objects on the appication layer will be very memory expensive
    ```
     # Returns list of ancestors, starting from parent until root.
-    #
     #   subchild1.ancestors # => [child1, root]
     def ancestors
       node, nodes = self, []
@@ -65,7 +64,6 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
   - Active Record CTE Implementation into ActiveRecord using `activerecord-cte` gem
   ```
     def self_and_ancestors
-      # to_do: parameratize inputs
       Node.with(
         :recursive,
         node_ancestors: "
