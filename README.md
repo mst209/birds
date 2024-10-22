@@ -37,7 +37,7 @@ The optimizer is able to see through the function boundry and utilize the indexe
   Node Load (0.8ms)  SELECT "nodes".* FROM "nodes" join get_ancestors_and_self(130) ancestors on nodes.id = ancestors.id ORDER BY ancestors.depth DESC LIMIT $1  [["LIMIT", 1]] # Once lowest common ancestor is initialized, we make a subsequesnt call to find the root
   Node Count (0.7ms)  SELECT COUNT(*) FROM "nodes" join get_ancestors_and_self(130) ancestors on nodes.id = ancestors.id # And one more call to find the depth
 
-*** Note this can be combined into one query, however since only one row is being returned and initialized in the ruby runtime there is marginal performance gain of aggrigating this inside one postgres function
+*** Note this can be combined into one query, however since only one row is being returned and initialized in the ruby runtime there is marginal performance gain of aggregating this inside one CTE
 ```
 
 Query Plan for `lowest_common_ancestor`
