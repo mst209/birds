@@ -12,14 +12,15 @@
    1. Based on data it is clear that foreign keys should not be used, therefor they have been omitted.
 8. Write Recursive CTE functions to efficiently traverse trees.
 9.  Use `fx` gem to manage migrations of CTE functions
-10. Add `ancestors`, `self_and_ancestors`, `descendents`, `self_and_descendents`, `common_ancestors`, `root`, `depth`, and `lowest_common_ancestor`, `search_birds` methods to the model
-11. Add `rspec` & `rubocop`
-12. Create the api contoller using `rails g controller CommonAncestors`
-13. Update the `config/routes.rb`
-14. Add the birds model using `rails g model Bird`
-15. Add the birds controller using `rails g controller Birds`
-16. Use Rubocop to clean up code
-17. Add specs to handle cyclical trees.
+10. Add `ancestors`, `self_and_ancestors`, `descendents`, `self_and_descendents`, `common_ancestors`, `root`, `depth`, and `lowest_common_ancestor`, methods to the `Node` model
+11. Add `search_by_node_ids` to the `Bird` model
+12. Add `rspec` & `rubocop`
+13. Create the api contoller using `rails g controller CommonAncestors`
+14. Update the `config/routes.rb`
+15. Add the birds model using `rails g model Bird`
+16. Add the birds controller using `rails g controller Birds`
+17. Use Rubocop to clean up code
+18. Add specs to handle cyclical trees.
 
 ## Steps needed to profile and optimize perfomance
 1. Understand the shape of the data (distribution children / node)

@@ -150,10 +150,4 @@ RSpec.describe Node do
       expect(described_class.compare(9, 11)).to eq({ root_id: 10, lowest_common_ancestor: 9, depth: 4 })
     end
   end
-
-  describe 'search_birds' do
-    it 'returns the bird ids' do
-      expect(described_class.search_birds([2, 4])).to eq([101, 102, 103, 105])
-    end
-  end
 end
