@@ -61,7 +61,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
   - More difficult implimentation into active record
   - Will be sort of hard to maintain in the codebase, can lead to ugly code
 - Notes: 
-  - Wrapping CTE's into functions that return tables make them easier to implement, however harder to analyze.
+  - Wrapping CTE's in functions that return tables make them easier to implement.
     - [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
     - [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
     - [get_descendants(node_id)](db/functions/get_descendants_v01.sql)
@@ -69,11 +69,11 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
     - [get_descendant_birds(node_ids)](db/functions/get_descendant_birds_v01.sql)
 
   ```
-    WITH RECURSIVE node_ancestors AS (
+    EXPLAIN ANALYZE WITH RECURSIVE node_ancestors AS (
       -- TO DO, maybe persist this in a temp table instead of an array
       SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
       FROM nodes n1
-      WHERE n1.id = node_id
+      WHERE n1.id = 5
       
       UNION ALL
       
@@ -87,9 +87,28 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
     -- Return all ancestors
     SELECT na.id, na.depth
     FROM node_ancestors na
-    WHERE na.id != node_id; -- Exclude the start node itself
+    WHERE na.id != 5; -- Exclude the start node itself
   ```
-
+  Query Plan
+  ```
+    CTE Scan on node_ancestors na  (cost=14.49..14.97 rows=20 width=12) (actual time=0.210..0.227 rows=3 loops=1)
+      Filter: (id <> 5)
+      Rows Removed by Filter: 1
+      CTE node_ancestors
+        ->  Recursive Union  (cost=0.00..14.49 rows=21 width=48) (actual time=0.094..0.219 rows=4 loops=1)
+              ->  Seq Scan on nodes n1  (cost=0.00..1.02 rows=1 width=48) (actual time=0.091..0.093 rows=1 loops=1)
+                    Filter: (id = 5)
+                    Rows Removed by Filter: 9
+              ->  Hash Join  (cost=1.04..1.30 rows=2 width=48) (actual time=0.027..0.028 rows=1 loops=4)
+                    Hash Cond: (ta.parent_id = t.id)
+                    Join Filter: (t.id <> ALL (ta.path))
+                    ->  WorkTable Scan on node_ancestors ta  (cost=0.00..0.20 rows=10 width=40) (actual time=0.000..0.000 rows=1 loops=4)
+                    ->  Hash  (cost=1.02..1.02 rows=2 width=12) (actual time=0.068..0.069 rows=10 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                          ->  Seq Scan on nodes t  (cost=0.00..1.02 rows=2 width=12) (actual time=0.003..0.004 rows=10 loops=1)
+    Planning Time: 12.308 ms
+    Execution Time: 0.583 ms
+  ```
 
 ###### Recursive Function Implementation
 - Pros: 
