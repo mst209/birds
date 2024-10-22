@@ -52,15 +52,16 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
 ##### Recursive CTE Implementation
 - Pros: 
   - Tree traversal can be performed at the database level
+  - Really clean active record implementation using `activerecord-cte` gem.
   - Using a read/write configuration a seperate read-only clone can be setup and optimized for memory allocation
   - `work_mem` can be increased to prevent large subqueries from hitting the disk
   - `max_parallel_workers_per_gather` and `max_parallel_workers` can be tweaked for parallelization of hash joins
   
 - Cons: 
-  - More difficult implimentation into active record
-  - Will be sort of hard to maintain in the codebase, can lead to ugly code
+  - Can lead to some ugly CTE Code
+  
 - Notes: 
-  - Wrapping CTE's in functions that return tables make them easier to implement.
+  - Wrapping CTE's in functions that return tables make them more efficient but difficult to work on.
     - [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
     - [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
     - [get_descendants(node_id)](db/functions/get_descendants_v01.sql)
