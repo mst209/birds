@@ -185,6 +185,17 @@ CDC (Change Data Capture) Can be setup on the nodes table and publish events for
   - Graph DB can get out of sync
   - Difficult to implement into active record
 
+```mermaid
+architecture-beta
+    group api[Change Data Capture]
+
+    service db(database)[Database] in api
+    service cdc(server)[Debezium Kafka] in api
+    service graph(database)[Graph DB] in api
+    db:R --> L:cdc
+    cdc:R --> L:graph
+
+```
 
 ## Getting Started
 1. Clone repo
