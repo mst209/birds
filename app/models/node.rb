@@ -100,6 +100,4 @@ class Node < ApplicationRecord
     end
     { root_id: nil, lowest_common_ancestor: nil, depth: nil }
   end
-
-  
 end
