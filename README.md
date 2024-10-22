@@ -152,7 +152,8 @@ CDC (Change Data Capture) Can be setup on the nodes table and publish events for
   - Fast reads, graph databases are very good at tree traversal.
   - Probally the most scalable solution for extremely large datasets.
       
-- Cons: More complicated to setup
+- Cons: 
+  - More complicated to setup
   - Graph DB can get out of sync
   - Difficult to implement into active record
 
