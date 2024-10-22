@@ -21,7 +21,7 @@
 16. Use Rubocop to clean up code
 17. Add specs to handle cyclical trees.
 
-## Steps needed to measure and optimize perfomance
+## Steps needed to profile and optimize perfomance
 1. Understand the shape of the data (distribution children / node)
    1. If the data is wide (many children per node), there won't be as many recursive loops.
    2. If the data is deep, there will be many recursive loops.
