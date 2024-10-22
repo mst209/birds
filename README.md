@@ -40,7 +40,7 @@ The optimizer is able to see through the function boundry and utilize the indexe
 *** Note this can be combined into one query, however since only one row is being returned and initialized in the ruby runtime there is marginal performance gain of aggrigating this inside one postgres function
 ```
 
-Query Plan
+Query Plan for `lowest_common_ancestor`
 ```
 Sort  (cost=35.01..35.14 rows=50 width=32)
   Sort Key: ancestors.depth
@@ -53,6 +53,20 @@ Sort  (cost=35.01..35.14 rows=50 width=32)
                     ->  Function Scan on get_ancestors_and_self ancestors  (cost=0.25..10.25 rows=1000 width=12)
                     ->  Hash  (cost=1.02..1.02 rows=2 width=28)
                           ->  Seq Scan on nodes  (cost=0.00..1.02 rows=2 width=28)
+```
+
+Query Plan for `search_birds`
+```
+EXPLAIN SELECT "birds".* FROM "birds" join get_birds(ARRAY[7]) b on birds.id = b.id ORDER BY "birds"."id" ASC
+                                   QUERY PLAN
+--------------------------------------------------------------------------------
+ Sort  (cost=105.34..107.84 rows=1000 width=28)
+   Sort Key: birds.id
+   ->  Hash Join  (cost=42.88..55.51 rows=1000 width=28)
+         Hash Cond: (b.id = birds.id)
+         ->  Function Scan on get_birds b  (cost=0.25..10.25 rows=1000 width=8)
+         ->  Hash  (cost=24.50..24.50 rows=1450 width=28)
+               ->  Seq Scan on birds  (cost=0.00..24.50 rows=1450 width=28)
 ```
 
 ** Hash joins parallelize and scale better than any other join, allowing us to take advantage of postgres parellel query functionality on large data sets (configuration required)
