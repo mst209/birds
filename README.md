@@ -1,4 +1,4 @@
-# README
+# Birds API
 
 ## Steps taken to solve
 1. Setup Boilerplate rails application using `rails new birds-api --api -d postgresql`
