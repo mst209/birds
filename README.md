@@ -67,7 +67,8 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
     - [get_descendants(node_id)](db/functions/get_descendants_v01.sql)
     - [get_descendants_and_self(node_id)](db/functions/get_descendants_and_self_v01.sql)
     - [get_descendant_birds(node_ids)](db/functions/get_descendant_birds_v01.sql)
-
+  
+  Get Ancestors CTE
   ```
     EXPLAIN ANALYZE WITH RECURSIVE node_ancestors AS (
       -- TO DO, maybe persist this in a temp table instead of an array
