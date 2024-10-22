@@ -9,9 +9,9 @@ jobs:
         ports:
           - "5432:5432"
         env:
-          POSTGRES_DB: rails_test
-          POSTGRES_USER: rails
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: birds_api_production
+          POSTGRES_USER: birds_api
+          POSTGRES_PASSWORD: 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
