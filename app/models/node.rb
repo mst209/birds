@@ -7,7 +7,7 @@ class Node < ApplicationRecord
     # to_do: parameratize inputs
     Node.with(
       :recursive,
-      node_ancestors_cte: "
+      node_ancestors: "
       SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
       FROM nodes n1
       WHERE n1.id = #{id}
@@ -16,10 +16,10 @@ class Node < ApplicationRecord
 
       SELECT t.id, t.parent_id, ta.depth + 1, ta.path || t.id
       FROM nodes t
-      INNER JOIN node_ancestors_cte ta ON t.id = ta.parent_id
+      INNER JOIN node_ancestors ta ON t.id = ta.parent_id
       WHERE NOT t.id = ANY(ta.path)
     "
-    ).joins('JOIN node_ancestors_cte na ON nodes.id = na.id').order('na.depth')
+    ).joins('JOIN node_ancestors na ON nodes.id = na.id').order('na.depth')
   end
 
   def ancestors
@@ -29,7 +29,7 @@ class Node < ApplicationRecord
   def self_and_descendants
     Node.with(
       :recursive,
-      node_descendants_cte: "
+      node_descendants: "
       SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
       FROM nodes n1
       WHERE n1.id = #{id}
@@ -38,10 +38,10 @@ class Node < ApplicationRecord
 
       SELECT t.id, t.parent_id, td.depth + 1, td.path || t.id
       FROM nodes t
-      INNER JOIN node_descendants_cte td ON t.parent_id = td.id
+      INNER JOIN node_descendants td ON t.parent_id = td.id
       WHERE NOT t.id = ANY(td.path)
     "
-    ).joins('JOIN node_descendants_cte nd ON nodes.id = nd.id').order('nd.depth')
+    ).joins('JOIN node_descendants nd ON nodes.id = nd.id').order('nd.depth')
   end
 
   def descendants
@@ -59,7 +59,7 @@ class Node < ApplicationRecord
   def common_ancestors(another_node)
     self_and_ancestors.with(
       :recursive,
-      another_node_ancestors_cte: "
+      another_node_ancestors: "
         SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
         FROM nodes n1
         WHERE n1.id = #{another_node.id}
@@ -68,17 +68,17 @@ class Node < ApplicationRecord
 
         SELECT t.id, t.parent_id, ta.depth + 1, ta.path || t.id
         FROM nodes t
-        INNER JOIN another_node_ancestors_cte ta ON t.id = ta.parent_id
+        INNER JOIN another_node_ancestors ta ON t.id = ta.parent_id
         WHERE NOT t.id = ANY(ta.path)
       ",
-      common_ancestors_cte: "
+      common_ancestors: "
         SELECT na.id, na.depth
-        FROM node_ancestors_cte na
-        JOIN another_node_ancestors_cte ana
+        FROM node_ancestors na
+        JOIN another_node_ancestors ana
         on na.id=ana.id
         ORDER BY na.depth, ana.depth
       "
-    ).joins('JOIN common_ancestors_cte ca ON ca.id = nodes.id').order('ca.depth')
+    ).joins('JOIN common_ancestors ca ON ca.id = nodes.id').order('ca.depth')
   end
 
   def lowest_common_ancestor(another_node)
