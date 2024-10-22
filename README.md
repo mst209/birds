@@ -12,7 +12,7 @@
    1. Based on data it is clear that foreign keys should not be used, therefor they have been omitted.
 8. Write Recursive CTE functions to efficiently traverse trees.
 9.  Use `fx` gem to manage migrations of CTE functions
-10. Add `ancestors`, `self_and_ancestors`, `descendents`, `self_and_descendents`, `common_ancestors`, `root`, `depth`, and `lowest_common_ancestor` methods to the model
+10. Add `ancestors`, `self_and_ancestors`, `descendents`, `self_and_descendents`, `common_ancestors`, `root`, `depth`, and `lowest_common_ancestor`, `search_birds` methods to the model
 11. Add `rspec` & `rubocop`
 12. Create the api contoller using `rails g controller CommonAncestors`
 13. Update the `config/routes.rb`
