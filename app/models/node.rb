@@ -5,19 +5,47 @@ class Node < ApplicationRecord
 
   def self_and_ancestors
     # to_do: parameratize inputs
-    Node.joins("join get_ancestors_and_self(#{id}) ancestors on nodes.id = ancestors.id").order('ancestors.depth')
+    Node.with(
+      :recursive,
+      node_ancestors: "
+      SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
+      FROM nodes n1
+      WHERE n1.id = #{id}
+
+      UNION ALL
+
+      SELECT t.id, t.parent_id, ta.depth + 1, ta.path || t.id
+      FROM nodes t
+      INNER JOIN node_ancestors ta ON t.id = ta.parent_id
+      WHERE NOT t.id = ANY(ta.path)
+    "
+    ).joins('JOIN node_ancestors na ON nodes.id = na.id').order('na.depth')
   end
 
   def ancestors
-    Node.joins("join get_ancestors(#{id}) ancestors on nodes.id = ancestors.id").order('ancestors.depth')
+    self_and_ancestors.where('nodes.id != na.id').order('na.depth')
   end
 
   def self_and_descendants
-    Node.joins("join get_descendants_and_self(#{id}) ancestors on nodes.id = ancestors.id").order('ancestors.depth')
+    Node.with(
+      :recursive,
+      node_descendants: "
+      SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
+      FROM nodes n1
+      WHERE n1.id = #{id}
+
+      UNION ALL
+
+      SELECT t.id, t.parent_id, td.depth + 1, td.path || t.id
+      FROM nodes t
+      INNER JOIN node_descendants td ON t.parent_id = td.id
+      WHERE NOT t.id = ANY(td.path)
+    "
+    ).joins('JOIN node_descendants nd ON nodes.id = nd.id').order('nd.depth')
   end
 
   def descendants
-    Node.joins("join get_descendants(#{id}) descendants on nodes.id = descendants.id").order('descendants.depth')
+    self_and_descendants.joins('JOIN node_descendants nd ON nodes.id = nd.id').where('nodes.id != nd.id').order('nd.depth')
   end
 
   def root
@@ -29,7 +57,28 @@ class Node < ApplicationRecord
   end
 
   def common_ancestors(another_node)
-    self_and_ancestors.joins("join get_ancestors_and_self(#{another_node.id}) ancestors2 on ancestors.id = ancestors2.id").order('ancestors.depth')
+    self_and_ancestors.with(
+      :recursive,
+      another_node_ancestors: "
+        SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
+        FROM nodes n1
+        WHERE n1.id = #{another_node.id}
+
+        UNION ALL
+
+        SELECT t.id, t.parent_id, ta.depth + 1, ta.path || t.id
+        FROM nodes t
+        INNER JOIN another_node_ancestors ta ON t.id = ta.parent_id
+        WHERE NOT t.id = ANY(ta.path)
+      ",
+      common_ancestors: "
+        SELECT na.id, na.depth
+        FROM node_ancestors na
+        JOIN another_node_ancestors ana
+        on na.id=ana.id
+        ORDER BY na.depth, ana.depth
+      "
+    ).joins('JOIN common_ancestors ca ON ca.id = nodes.id').order('ca.depth')
   end
 
   def lowest_common_ancestor(another_node)
@@ -53,6 +102,20 @@ class Node < ApplicationRecord
   end
 
   def self.search_birds(node_ids)
-    Bird.joins("join get_descendant_birds(ARRAY[#{node_ids.join(',')}]) b on birds.id = b.id").order(:id).map(&:id)
+    Bird.with(
+      :recursive,
+      node_descendants: "
+      SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
+      FROM nodes n1
+      WHERE n1.id IN (#{node_ids.join(',')})
+
+      UNION ALL
+
+      SELECT t.id, t.parent_id, td.depth + 1, td.path || t.id
+      FROM nodes t
+      INNER JOIN node_descendants td ON t.parent_id = td.id
+      WHERE NOT t.id = ANY(td.path)
+    "
+    ).joins('JOIN node_descendants nd ON birds.node_id = nd.id').distinct.order(:id).map(&:id)
   end
 end
