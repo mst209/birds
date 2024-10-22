@@ -110,7 +110,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
     Planning Time: 12.308 ms
     Execution Time: 0.583 ms
   ```
-  CTE Function Query Plan
+  CTE Function Query Plan (More Performant, Less Transparent)
   ```
   explain ANALYZE select * from get_ancestors(5);
 
