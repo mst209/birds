@@ -11,7 +11,7 @@ jobs:
         env:
           POSTGRES_DB: birds_api_production
           POSTGRES_USER: birds_api
-          POSTGRES_PASSWORD: 
+          POSTGRES_PASSWORD: password
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
