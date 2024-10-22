@@ -21,63 +21,141 @@
 16. Use Rubocop to clean up code
 17. Add specs to handle cyclical trees.
 
-## Comments on Efficiency and Scalability
-In order for this to scale effectively, the goal is to move as much of the recursive logic into Postgres, and out of active record.
+## Steps needed to measure and optimize perfomance
+1. Understand the shape of the data (distribution children / node)
+   1. If the data is wide (many children per node), there won't be as many recursive loops.
+   2. If the data is deep, there will be many recursive loops.
+2. Create a load test database to test against, seed via seed generation script.
+3. Benchmark performance, profile database queries
 
-By joining window functions (that return recursive CTE's) inside of active record we get the best of both worlds, Highly efficient recursion inside of postgres, and sql composition to easily initialize the objects when we need them.
+## Naive attempts at performance optimization
+Without knowing the shape of the data, this is a comparison of methods to accomplish tree traversal.
 
-For example: Calling `node_a.lowest_common_ancestor(node_b)` joins ancestors of each and returns the first result without having to make subsequent calls to the database.
+### Understand the various methods of retrieving data.
+##### Active Record Implementation
+  - Pros: 
+    - Easy to debug / Implement
+  - Cons: 
+    - Needs to make individual database calls for each layer of children
+    - Initializing Objects on the appication layer will be very memory expensive
+   ```
+    # Returns list of ancestors, starting from parent until root.
+    #
+    #   subchild1.ancestors # => [child1, root]
+    def ancestors
+      node, nodes = self, []
+      nodes << node = node.parent while node.parent
+      nodes
+    end
+   ```
+##### Postgres Based Implementations
 
-The optimizer is able to see through the function boundry and utilize the indexes of the underlying table.
+###### Recursive CTE Implementation
+- Pros: 
+  - Tree traversal can be performed at the database level
+  - Using a read/write configuration a seperate read-only clone can be setup and optimized for memory allocation
+  - `work_mem` can be increased to prevent large subqueries from hitting the disk
+  - `max_parallel_workers_per_gather` and `max_parallel_workers` can be tweaked for parallelization of hash joins
+  
+- Cons: 
+  - More difficult implimentation into active record
+  - Will be sort of hard to maintain in the codebase, can lead to ugly code
+- Notes: 
+  - Wrapping CTE's into functions that return tables make them easier to implement
+    - [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
+    - [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
+    - [get_descendants(node_id)](db/functions/get_descendants_v01.sql)
+    - [get_descendants_and_self(node_id)](db/functions/get_descendants_and_self_v01.sql)
+    - [get_descendant_birds(node_ids)](db/functions/get_descendant_birds_v01.sql)
 
-```
-> Node.compare(5497637, 4430546)
-  Node Load (1.8ms)  SELECT "nodes".* FROM "nodes" WHERE "nodes"."id" = $1 LIMIT $2  [["id", 5497637], ["LIMIT", 1]] # Find record with id = 5497637
-  Node Load (0.4ms)  SELECT "nodes".* FROM "nodes" WHERE "nodes"."id" = $1 LIMIT $2  [["id", 4430546], ["LIMIT", 1]] # Find record with id = 4430546
-  Node Load (2.9ms)  SELECT "nodes".* FROM "nodes" join get_ancestors_and_self(5497637) ancestors on nodes.id = ancestors.id join get_ancestors_and_self(4430546) ancestors2 on ancestors.id = ancestors2.id ORDER BY ancestors.depth LIMIT $1 # Find Lowest Common Ancestor (Record 4430546), by joining 2 window function inside of postgres
-  Node Load (0.8ms)  SELECT "nodes".* FROM "nodes" join get_ancestors_and_self(130) ancestors on nodes.id = ancestors.id ORDER BY ancestors.depth DESC LIMIT $1  [["LIMIT", 1]] # Once lowest common ancestor is initialized, we make a subsequesnt call to find the root
-  Node Count (0.7ms)  SELECT COUNT(*) FROM "nodes" join get_ancestors_and_self(130) ancestors on nodes.id = ancestors.id # And one more call to find the depth
+  ```
+    WITH RECURSIVE node_ancestors AS (
+      -- TO DO, maybe persist this in a temp table instead of an array
+      SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
+      FROM nodes n1
+      WHERE n1.id = node_id
+      
+      UNION ALL
+      
+      -- Recursively select parents
+      SELECT t.id, t.parent_id, ta.depth + 1, ta.path || t.id
+      FROM nodes t
+      INNER JOIN node_ancestors ta ON t.id = ta.parent_id
+      -- Stop recursion if we've already visited this node (to prevent loops)
+      WHERE NOT t.id = ANY(ta.path)
+    )
+    -- Return all ancestors
+    SELECT na.id, na.depth
+    FROM node_ancestors na
+    WHERE na.id != node_id; -- Exclude the start node itself
+  ```
 
-*** Note this can be combined into one query, however since only one row is being returned and initialized in the ruby runtime there is marginal performance gain of aggregating this inside one CTE
-```
 
-Query Plan for `lowest_common_ancestor`
-```
-Sort  (cost=35.01..35.14 rows=50 width=32)
-  Sort Key: ancestors.depth
-  ->  Hash Join  (cost=14.35..33.60 rows=50 width=32)
-        Hash Cond: (ancestors2.id = nodes.id)
-        ->  Function Scan on get_ancestors_and_self ancestors2  (cost=0.25..10.25 rows=1000 width=8)
-        ->  Hash  (cost=13.98..13.98 rows=10 width=40)
-              ->  Hash Join  (cost=1.29..13.98 rows=10 width=40)
-                    Hash Cond: (ancestors.id = nodes.id)
-                    ->  Function Scan on get_ancestors_and_self ancestors  (cost=0.25..10.25 rows=1000 width=12)
-                    ->  Hash  (cost=1.02..1.02 rows=2 width=28)
-                          ->  Seq Scan on nodes  (cost=0.00..1.02 rows=2 width=28)
-```
+###### Recursive Function Implementation
+- Pros: 
+  - Tree traversal can be performed at the database level
+  - Recursive function will make use of table indexes
+      
+- Cons: 
+  - More difficult implimentation into active record
+  - Will be sort of hard to maintain in the codebase, can lead to ugly code
+  - Dealing with cyclical loops more difficult
+  - Lack of transparency into function query plan
+  ```
+    CREATE OR REPLACE FUNCTION get_ancestors(node_id INTEGER)
+    RETURNS TABLE(id BIGINT) AS $$
+    BEGIN
+      RETURN QUERY
+      SELECT (get_ancestors(n.parent_id)).*
+      FROM nodes n with n.id = node_id
+      
+      RETURN QUERY
+      SELECT n2.id
+      FROM nodes n2
+      WHERE n2.id != node_id; -- Exclude the start node itself
+    END;
+    $$ LANGUAGE plpgsql;
 
-Query Plan for `search_birds`
-```
-EXPLAIN SELECT "birds".* FROM "birds" join get_descendant_birds(ARRAY[7]) b on birds.id = b.id ORDER BY "birds"."id" ASC
-                                   QUERY PLAN
---------------------------------------------------------------------------------
- Sort  (cost=105.34..107.84 rows=1000 width=28)
-   Sort Key: birds.id
-   ->  Hash Join  (cost=42.88..55.51 rows=1000 width=28)
-         Hash Cond: (b.id = birds.id)
-         ->  Function Scan on get_descendant_birds b  (cost=0.25..10.25 rows=1000 width=8)
-         ->  Hash  (cost=24.50..24.50 rows=1450 width=28)
-               ->  Seq Scan on birds  (cost=0.00..24.50 rows=1450 width=28)
-```
+    SELECT * FROM get_ancestors(node_id);
+  ```
 
-** Hash joins parallelize and scale better than any other join, allowing us to take advantage of postgres parellel query functionality on large data sets (configuration required)
+###### LTREE Implementation (Pre-Processing)
+- Pros:
+  - Fast reads, as Built in functionality of ltree datatype removes the need for tree traversal.
+  - Can be indexed using GIST
+  - Fairly simple SQL syntax for ancestors, descendents
+  - Good for data that does not get updated very often
+- Cons: 
+  - Slow writes, Deeply nested trees would require cascading updates.
+  - Since db records can be updated from an outside service triggers or cdc would need to be setup on the table
+  - Unclear if there are size limitations for deeply nested trees
+  ```
+    SELECT
+      *
+    FROM
+      myTree
+    WHERE
+      path @> (
+        SELECT
+          path
+        FROM
+          myTree
+        WHERE
+          label = 'C'
+      );
+  ```
 
-## Recursive CTE Functions
-* [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
-* [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
-* [get_descendants(node_id)](db/functions/get_descendants_v01.sql)
-* [get_descendants_and_self(node_id)](db/functions/get_descendants_and_self_v01.sql)
-* [get_descendant_birds(node_ids)](db/functions/get_descendant_birds_v01.sql)
+###### Realtime ETL to Graph DB (Pre-Processing)
+CDC (Change Data Capture) Can be setup on the nodes table and publish events for processing. Queue workers can subscribe to the queues and take the events from the queue, and make the necessary updates to the graph db in near realtime
+
+- Pros: 
+  - Fast reads, graph databases are very good at tree traversal.
+  - Probally the most scalable solution for extremely large datasets.
+      
+- Cons: More complicated to setup
+  - Graph DB can get out of sync
+  - Difficult to implement into active record
+
 
 ## Getting Started
 1. Clone repo
