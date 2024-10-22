@@ -83,6 +83,12 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
       ).joins('JOIN node_ancestors na ON nodes.id = na.id').order('na.depth')
     end
   ```
+  - They are also composable
+  ```
+  def ancestors
+    self_and_ancestors.where('nodes.id != na.id').order('na.depth')
+  end
+  ```
   - Wrapping CTE's in functions that return tables make them a little more efficient, and composable, but difficult to optimize.
     - [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
     - [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
