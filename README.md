@@ -90,7 +90,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
     FROM node_ancestors na
     WHERE na.id != 5; -- Exclude the start node itself
   ```
-  Query Plan
+  CTE Query Plan
   ```
     CTE Scan on node_ancestors na  (cost=14.49..14.97 rows=20 width=12) (actual time=0.210..0.227 rows=3 loops=1)
       Filter: (id <> 5)
@@ -109,6 +109,14 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
                           ->  Seq Scan on nodes t  (cost=0.00..1.02 rows=2 width=12) (actual time=0.003..0.004 rows=10 loops=1)
     Planning Time: 12.308 ms
     Execution Time: 0.583 ms
+  ```
+  CTE Function Query Plan
+  ```
+  explain ANALYZE select * from get_ancestors(5);
+
+  Function Scan on get_ancestors  (cost=0.25..10.25 rows=1000 width=12) (actual time=0.181..0.181 rows=3 loops=1)
+  Planning Time: 0.032 ms
+  Execution Time: 0.202 ms
   ```
 
 ###### Recursive Function Implementation
