@@ -13,6 +13,7 @@ RSpec.describe Bird do
 
   describe 'search_by_node_ids' do
     it 'returns the bird ids' do
+      binding.pry
       expect(described_class.search_by_node_ids([2, 4])).to eq([101, 102, 103, 105])
     end
   end

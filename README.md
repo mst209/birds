@@ -184,7 +184,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
 - Cons: 
   - Slow writes, Deeply nested trees would require cascading updates.
   - Since db records can be updated from an outside service triggers or cdc would need to be setup on the table
-  - Unclear if there are size limitations / performance implications for deeply nested trees
+  - Unclear if there are size limitations / performance implications for deeply nested paths
   ```
     SELECT
       *
