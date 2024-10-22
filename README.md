@@ -31,8 +31,7 @@
 ## Naive attempts at performance optimization
 Without knowing the shape of the data, this is a comparison of methods to accomplish tree traversal.
 
-### Understand the various methods of retrieving data.
-##### Active Record Implementation
+#### Active Record Implementation
   - Pros: 
     - Easy to debug / Implement
   - Cons: 
@@ -48,9 +47,9 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
       nodes
     end
    ```
-##### Postgres Based Implementations
+#### Postgres Based Implementations
 
-###### Recursive CTE Implementation
+##### Recursive CTE Implementation
 - Pros: 
   - Tree traversal can be performed at the database level
   - Using a read/write configuration a seperate read-only clone can be setup and optimized for memory allocation
@@ -119,7 +118,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
   Execution Time: 0.202 ms
   ```
 
-###### Recursive Function Implementation
+##### Recursive Function Implementation
 - Pros: 
   - Tree traversal can be performed at the database level
   - Recursive function will make use of table indexes
@@ -147,7 +146,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
     SELECT * FROM get_ancestors(node_id);
   ```
 
-###### LTREE Implementation (Pre-Processing)
+##### LTREE Implementation (Pre-Processing)
 - Pros:
   - Fast reads, as Built in functionality of ltree datatype removes the need for tree traversal.
   - Can be indexed using GIST
@@ -173,7 +172,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
       );
   ```
 
-###### Realtime ETL to Graph DB (Pre-Processing)
+##### Realtime ETL to Graph DB (Pre-Processing)
 CDC (Change Data Capture) Can be setup on the nodes table and publish events for processing. Queue workers can subscribe to the queues and take the events from the queue, and make the necessary updates to the graph db in near realtime
 
 - Pros: 
