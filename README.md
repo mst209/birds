@@ -61,7 +61,28 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
 - Cons: 
   - Can lead to some ugly CTE Code
   
-- Notes: 
+- Notes:
+  - Active Record CTE Implementation into ActiveRecord using `activerecord-cte` gem
+  ```
+    def self_and_ancestors
+      # to_do: parameratize inputs
+      Node.with(
+        :recursive,
+        node_ancestors: "
+        SELECT n1.id, n1.parent_id, 0 AS depth, ARRAY[n1.id] AS path
+        FROM nodes n1
+        WHERE n1.id = #{id}
+
+        UNION ALL
+
+        SELECT t.id, t.parent_id, ta.depth + 1, ta.path || t.id
+        FROM nodes t
+        INNER JOIN node_ancestors ta ON t.id = ta.parent_id
+        WHERE NOT t.id = ANY(ta.path)
+      "
+      ).joins('JOIN node_ancestors na ON nodes.id = na.id').order('na.depth')
+    end
+  ```
   - Wrapping CTE's in functions that return tables make them a little more efficient, and composable, but difficult to optimize.
     - [get_ancestors(node_id)](db/functions/get_ancestors_v01.sql)
     - [get_ancestors_and_self(node_id)](db/functions/get_ancestors_and_self_v01.sql)
@@ -69,7 +90,7 @@ Without knowing the shape of the data, this is a comparison of methods to accomp
     - [get_descendants_and_self(node_id)](db/functions/get_descendants_and_self_v01.sql)
     - [get_descendant_birds(node_ids)](db/functions/get_descendant_birds_v01.sql)
   
-  Get Ancestors CTE
+  Get Ancestors CTE Function
   ```
     EXPLAIN ANALYZE WITH RECURSIVE node_ancestors AS (
       -- TO DO, maybe persist this in a temp table instead of an array
